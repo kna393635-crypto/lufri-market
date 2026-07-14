@@ -10,6 +10,7 @@ h1{color:#38bdf8;}
 .card{background:#334155; padding:15px; margin:10px; border-radius:12px; display:inline-block; width:250px;}
 .price{font-size:22px; font-weight:bold; color:#22c55e;}
 .down{color:#ef4444;}
+.error{color:#fbbf24;}
 </style>
 </head>
 <body>
@@ -26,53 +27,53 @@ h1{color:#38bdf8;}
 </div>
 
 <script>
-// 1. CRYPTO - CoinGecko API Free
 async function getCrypto(){
-  let res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana,binancecoin&vs_currencies=usd&include_24hr_change=true');
-  let data = await res.json();
+  try{
+    let res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana,binancecoin&vs_currencies=usd&include_24hr_change=true');
+    let data = await res.json();
 
-  let html = '';
-  for(let coin in data){
-    let price = data[coin].usd;
-    let change = data[coin].usd_24h_change.toFixed(2);
-    let color = change >= 0? 'price' : 'price down';
-    html += <div class="card">
-      <h3>${coin.toUpperCase()}</h3>
-      <p class="${color}">$${price.toLocaleString()}</p>
-      <p>24h: ${change}%</p>
-    </div>;
+    let html = '';
+    let coins = {bitcoin:'BTC', ethereum:'ETH', solana:'SOL', binancecoin:'BNB'};
+    for(let coin in coins){
+      let price = data[coin].usd;
+      let change = data[coin].usd_24h_change.toFixed(2);
+      let color = change >= 0? 'price' : 'price down';
+      html += <div class="card">
+        <h3>${coins[coin]}</h3>
+        <p class="${color}">$${price.toLocaleString()}</p>
+        <p>24h: ${change}%</p>
+      </div>;
+    }
+    document.getElementById('crypto').innerHTML = html;
+  } catch(e){
+    document.getElementById('crypto').innerHTML = '<p class="error">API Error. 10s වලින් ආයෙත් try කරනවා</p>';
+    setTimeout(getCrypto, 10000);
   }
-  document.getElementById('crypto').innerHTML = html;
 }
 
-// 2. FOREX + GOLD - ExchangeRate API Free
 async function getForex(){
-  let res = await fetch('https://open.er-api.com/v6/latest/USD');
-  let data = await res.json();
+  try{
+    let res = await fetch('https://open.er-api.com/v6/latest/USD');
+    let data = await res.json();
 
-  let usdToLkr = data.rates.LKR;
-  let goldPerOz = 2350; // දැන් average gold price $ එකට
-  let goldPerGramLkr = (goldPerOz / 31.1035) * usdToLkr; // 1oz = 31.1g
+    let usdToLkr = data.rates.LKR;
+    let goldPerOz = 2350; 
+    let goldPerGramLkr = (goldPerOz / 31.1035) * usdToLkr;
 
-  document.getElementById('forex').innerHTML = 
-    <div class="card">
-      <h3>USD to LKR</h3>
-      <p class="price">Rs. ${usdToLkr.toFixed(2)}</p>
-    </div>
-    <div class="card">
-      <h3>Gold 1g</h3>
-      <p class="price">Rs. ${goldPerGramLkr.toFixed(0)}</p>
-    </div>
-    <div class="card">
-      <h3>EUR to LKR</h3>
-      <p class="price">Rs. ${(data.rates.EUR * usdToLkr).toFixed(2)}</p>
-    </div>
-  ;
+    document.getElementById('forex').innerHTML = 
+      <div class="card"><h3>USD to LKR</h3><p class="price">Rs. ${usdToLkr.toFixed(2)}</p></div>
+      <div class="card"><h3>Gold 1g</h3><p class="price">Rs. ${goldPerGramLkr.toFixed(0)}</p></div>
+      <div class="card"><h3>EUR to LKR</h3><p class="price">Rs. ${(data.rates.EUR * usdToLkr).toFixed(2)}</p></div>
+    ;
+  } catch(e){
+    document.getElementById('forex').innerHTML = '<p class="error">API Error. 10s වලින් ආයෙත් try කරනවා</p>';
+    setTimeout(getForex, 10000);
+  }
 }
 
 getCrypto();
 getForex();
-setInterval(getCrypto, 60000); // min 1කට සැරයක් update
+setInterval(getCrypto, 60000);
 setInterval(getForex, 60000);
 </script>
 </body>
