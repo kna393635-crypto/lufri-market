@@ -35,8 +35,8 @@ async function getCrypto(){
     let html = '';
     let coins = {bitcoin:'BTC', ethereum:'ETH', solana:'SOL', binancecoin:'BNB'};
     for(let coin in coins){
-      let price = data[coin].usd;
-      let change = data[coin].usd_24h_change.toFixed(2);
+      let price = data[coin].usd; // <-- මේක තමයි fix එක
+      let change = data[coin].usd_24h_change.toFixed(2); // <-- මේකත්
       let color = change >= 0? 'price' : 'price down';
       html += <div class="card">
         <h3>${coins[coin]}</h3>
@@ -46,7 +46,7 @@ async function getCrypto(){
     }
     document.getElementById('crypto').innerHTML = html;
   } catch(e){
-    document.getElementById('crypto').innerHTML = '<p class="error">API Error. Refresh කරන්න</p>';
+    document.getElementById('crypto').innerHTML = '<p class="error">API Error. Vercel එකේ බලන්න</p>';
   }
 }
 
@@ -65,7 +65,7 @@ async function getForex(){
       <div class="card"><h3>EUR to LKR</h3><p class="price">Rs. ${(data.rates.EUR * usdToLkr).toFixed(2)}</p></div>
     ;
   } catch(e){
-    document.getElementById('forex').innerHTML = '<p class="error">API Error. Refresh කරන්න</p>';
+    document.getElementById('forex').innerHTML = '<p class="error">API Error. Vercel එකේ බලන්න</p>';
   }
 }
 
