@@ -4,7 +4,7 @@
 <title>Lufri Market - Crypto & Forex</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
-body{background:#0f172a; color:white; font-family:'Segoe UI'; padding:20px; text-align:center;}
+body{background:#0f172a; color:white; font-family:'Segoe UI'; padding:20px; text-align:center; margin:0;}
 h1{color:#38bdf8;}
 .section{background:#1e293b; padding:20px; margin:20px auto; border-radius:15px; max-width:900px;}
 .card{background:#334155; padding:15px; margin:10px; border-radius:12px; display:inline-block; width:250px;}
@@ -46,8 +46,7 @@ async function getCrypto(){
     }
     document.getElementById('crypto').innerHTML = html;
   } catch(e){
-    document.getElementById('crypto').innerHTML = '<p class="error">API Error. 10s වලින් ආයෙත් try කරනවා</p>';
-    setTimeout(getCrypto, 10000);
+    document.getElementById('crypto').innerHTML = '<p class="error">API Error. Refresh කරන්න</p>';
   }
 }
 
@@ -66,15 +65,12 @@ async function getForex(){
       <div class="card"><h3>EUR to LKR</h3><p class="price">Rs. ${(data.rates.EUR * usdToLkr).toFixed(2)}</p></div>
     ;
   } catch(e){
-    document.getElementById('forex').innerHTML = '<p class="error">API Error. 10s වලින් ආයෙත් try කරනවා</p>';
-    setTimeout(getForex, 10000);
+    document.getElementById('forex').innerHTML = '<p class="error">API Error. Refresh කරන්න</p>';
   }
 }
 
 getCrypto();
 getForex();
-setInterval(getCrypto, 60000);
-setInterval(getForex, 60000);
 </script>
 </body>
 </html>
