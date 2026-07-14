@@ -1,77 +1,43 @@
 <!DOCTYPE html>
-<html lang="si">
+<html>
 <head>
-<meta charset="UTF-8">
-<title>Lufri Market - Crypto & Forex</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lufri Market</title>
 <style>
-body{background:#0f172a; color:white; font-family:'Segoe UI'; padding:20px; text-align:center; margin:0;}
-h1{color:#38bdf8;}
-.section{background:#1e293b; padding:20px; margin:20px auto; border-radius:15px; max-width:900px;}
-.card{background:#334155; padding:15px; margin:10px; border-radius:12px; display:inline-block; width:250px; vertical-align:top;}
-.price{font-size:22px; font-weight:bold; color:#22c55e;}
-.down{color:#ef4444;}
+body{background:#0f172a;color:white;font-family:Arial;text-align:center;padding:20px}
+.box{background:#1e293b;padding:20px;margin:20px auto;border-radius:10px;max-width:800px}
+.card{background:#334155;padding:15px;margin:10px;display:inline-block;border-radius:10px;width:200px}
+.price{font-size:20px;color:#22c55e;font-weight:bold}
 </style>
 </head>
 <body>
-<h1>📊 Lufri Market Analysis</h1>
+<h1>📊 Lufri Market</h1>
 
-<div class="section">
-<h2>🪙 Crypto Prices - Live</h2>
+<div class="box">
+<h2>Crypto</h2>
 <div id="crypto">Loading...</div>
 </div>
 
-<div class="section">
-<h2>💵 Forex & Gold - LKR</h2>
+<div class="box">
+<h2>Forex LKR</h2>
 <div id="forex">Loading...</div>
 </div>
 
 <script>
-async function getCrypto(){
-  try{
-    let res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana,binancecoin&vs_currencies=usd&include_24hr_change=true');
-    let data = await res.json();
+fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=usd&include_24hr_change=true')
+.then(res => res.json())
+.then(data => {
+  document.getElementById('crypto').innerHTML = 
+  <div class="card"><h3>BTC</h3><p class="price">$${data.bitcoin.usd}</p></div>
+   <div class="card"><h3>ETH</h3><p class="price">$${data.ethereum.usd}</p></div>;
+});
 
-    let html = '';
-    let coins = {bitcoin:'BTC', ethereum:'ETH', solana:'SOL', binancecoin:'BNB'};
-    
-    for(let coin in coins){
-      let price = data.usd;
-      let change = data.usd_24h_change.toFixed(2);
-      let color = change >= 0 ? 'price' : 'price down';
-      html += <div class="card">
-        <h3>${coins}</h3>
-        <p class="${color}">$${price.toLocaleString()}</p>
-        <p>24h: ${change}%</p>
-      </div>;
-    }
-    document.getElementById('crypto').innerHTML = html;
-  } catch(e){
-    document.getElementById('crypto').innerHTML = '<p>API Error. Vercel එකේ බලන්න</p>';
-  }
-}
-
-async function getForex(){
-  try{
-    let res = await fetch('https://open.er-api.com/v6/latest/USD');
-    let data = await res.json();
-
-    let usdToLkr = data.rates.LKR;
-    let goldPerOz = 2350; 
-    let goldPerGramLkr = (goldPerOz / 31.1035) * usdToLkr;
-
-    document.getElementById('forex').innerHTML = 
-      <div class="card"><h3>USD to LKR</h3><p class="price">Rs. ${usdToLkr.toFixed(2)}</p></div>
-      <div class="card"><h3>Gold 1g</h3><p class="price">Rs. ${goldPerGramLkr.toFixed(0)}</p></div>
-      <div class="card"><h3>EUR to LKR</h3><p class="price">Rs. ${(data.rates.EUR * usdToLkr).toFixed(2)}</p></div>
-    ;
-  } catch(e){
-    document.getElementById('forex').innerHTML = '<p>API Error. Vercel එකේ බලන්න</p>';
-  }
-}
-
-getCrypto();
-getForex();
+fetch('https://open.er-api.com/v6/latest/USD')
+.then(res => res.json())
+.then(data => {
+  let lkr = data.rates.LKR.toFixed(2);
+  document.getElementById('forex').innerHTML = 
+  <div class="card"><h3>USD</h3><p class="price">Rs ${lkr}</p></div>;
+});
 </script>
 </body>
 </html>
