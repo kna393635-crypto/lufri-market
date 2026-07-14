@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="si">
+<head>
+<title>Lufri Market - Crypto & Forex</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+body{background:#0f172a; color:white; font-family:'Segoe UI'; padding:20px; text-align:center;}
+h1{color:#38bdf8;}
+.section{background:#1e293b; padding:20px; margin:20px auto; border-radius:15px; max-width:900px;}
+.card{background:#334155; padding:15px; margin:10px; border-radius:12px; display:inline-block; width:250px;}
+.price{font-size:22px; font-weight:bold; color:#22c55e;}
+.down{color:#ef4444;}
+</style>
+</head>
+<body>
+<h1>📊 Lufri Market Analysis</h1>
+
+<div class="section">
+<h2>🪙 Crypto Prices - Live</h2>
+<div id="crypto">Loading...</div>
+</div>
+
+<div class="section">
+<h2>💵 Forex & Gold - LKR</h2>
+<div id="forex">Loading...</div>
+</div>
+
+<script>
+// 1. CRYPTO - CoinGecko API Free
+async function getCrypto(){
+  let res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana,binancecoin&vs_currencies=usd&include_24hr_change=true');
+  let data = await res.json();
+
+  let html = '';
+  for(let coin in data){
+    let price = data[coin].usd;
+    let change = data[coin].usd_24h_change.toFixed(2);
+    let color = change >= 0? 'price' : 'price down';
+    html += <div class="card">
+      <h3>${coin.toUpperCase()}</h3>
+      <p class="${color}">$${price.toLocaleString()}</p>
+      <p>24h: ${change}%</p>
+    </div>;
+  }
+  document.getElementById('crypto').innerHTML = html;
+}
+
+// 2. FOREX + GOLD - ExchangeRate API Free
+async function getForex(){
+  let res = await fetch('https://open.er-api.com/v6/latest/USD');
+  let data = await res.json();
+
+  let usdToLkr = data.rates.LKR;
+  let goldPerOz = 2350; // දැන් average gold price $ එකට
+  let goldPerGramLkr = (goldPerOz / 31.1035) * usdToLkr; // 1oz = 31.1g
+
+  document.getElementById('forex').innerHTML = 
+    <div class="card">
+      <h3>USD to LKR</h3>
+      <p class="price">Rs. ${usdToLkr.toFixed(2)}</p>
+    </div>
+    <div class="card">
+      <h3>Gold 1g</h3>
+      <p class="price">Rs. ${goldPerGramLkr.toFixed(0)}</p>
+    </div>
+    <div class="card">
+      <h3>EUR to LKR</h3>
+      <p class="price">Rs. ${(data.rates.EUR * usdToLkr).toFixed(2)}</p>
+    </div>
+  ;
+}
+
+getCrypto();
+getForex();
+setInterval(getCrypto, 60000); // min 1කට සැරයක් update
+setInterval(getForex, 60000);
+</script>
+</body>
+</html>
