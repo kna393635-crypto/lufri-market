@@ -9,7 +9,6 @@ h1{color:#38bdf8}
 .box{background:#1e293b;padding:20px;margin:20px auto;border-radius:15px;max-width:900px}
 .card{background:#334155;padding:15px;margin:10px;display:inline-block;border-radius:12px;width:220px}
 .price{font-size:22px;color:#22c55e;font-weight:bold}
-.down{color:#ef4444}
 </style>
 </head>
 <body>
@@ -26,28 +25,31 @@ h1{color:#38bdf8}
 </div>
 
 <script>
+// Vercel වල block නොවෙන API
 async function loadData(){
-  // Crypto
   try{
-    let res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana&vs_currencies=usd&include_24hr_change=true');
+    // Crypto - CoinCap API use කරමු. මේක CORS block වෙන්නේ නෑ
+    let res = await fetch('https://api.coincap.io/v2/assets?ids=bitcoin,ethereum,solana');
     let data = await res.json();
     let html = '';
-    html += <div class="card"><h3>BTC</h3><p class="price">$${data.bitcoin.usd.toLocaleString()}</p><p>24h: ${data.bitcoin.usd_24h_change.toFixed(2)}%</p></div>;
-    html += <div class="card"><h3>ETH</h3><p class="price">$${data.ethereum.usd.toLocaleString()}</p><p>24h: ${data.ethereum.usd_24h_change.toFixed(2)}%</p></div>;
-    html += <div class="card"><h3>SOL</h3><p class="price">$${data.solana.usd.toLocaleString()}</p><p>24h: ${data.solana.usd_24h_change.toFixed(2)}%</p></div>;
+    data.data.forEach(coin => {
+      let price = parseFloat(coin.priceUsd).toFixed(2);
+      let change = parseFloat(coin.changePercent24Hr).toFixed(2);
+      html += <div class="card"><h3>${coin.symbol}</h3><p class="price">$${price}</p><p>24h: ${change}%</p></div>;
+    });
     document.getElementById('crypto').innerHTML = html;
-  }catch(e){ document.getElementById('crypto').innerHTML = 'API Error - Refresh'; }
+  }catch(e){ document.getElementById('crypto').innerHTML = 'API Error'; }
 
-  // Forex
   try{
-    let res = await fetch('https://open.er-api.com/v6/latest/USD');
+    // Forex - මේක free + fast
+    let res = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
     let data = await res.json();
     let usd = data.rates.LKR.toFixed(2);
     let gold = ((2350/31.1035)*data.rates.LKR).toFixed(0);
     document.getElementById('forex').innerHTML = 
       <div class="card"><h3>USD</h3><p class="price">Rs ${usd}</p></div>
       <div class="card"><h3>Gold 1g</h3><p class="price">Rs ${gold}</p></div>;
-  }catch(e){ document.getElementById('forex').innerHTML = 'API Error - Refresh'; }
+  }catch(e){ document.getElementById('forex').innerHTML = 'API Error'; }
 }
 loadData();
 </script>
