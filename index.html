@@ -25,23 +25,27 @@ h1{color:#38bdf8}
 </div>
 
 <script>
-// Vercel වල block නොවෙන API
+// 100% වැඩ කරන Crypto API - CryptoCompare
 async function loadData(){
   try{
-    // Crypto - CoinCap API use කරමු. මේක CORS block වෙන්නේ නෑ
-    let res = await fetch('https://api.coincap.io/v2/assets?ids=bitcoin,ethereum,solana');
+    let res = await fetch('https://min-api.cryptocompare.com/data/pricemultifull?fsyms=BTC,ETH,SOL&tsyms=USD');
     let data = await res.json();
     let html = '';
-    data.data.forEach(coin => {
-      let price = parseFloat(coin.priceUsd).toFixed(2);
-      let change = parseFloat(coin.changePercent24Hr).toFixed(2);
-      html += <div class="card"><h3>${coin.symbol}</h3><p class="price">$${price}</p><p>24h: ${change}%</p></div>;
-    });
+    
+    let btc = data.RAW.BTC.USD;
+    html += <div class="card"><h3>BTC</h3><p class="price">$${btc.PRICE.toLocaleString()}</p><p>24h: ${btc.CHANGEPCT24HOUR.toFixed(2)}%</p></div>;
+    
+    let eth = data.RAW.ETH.USD;
+    html += <div class="card"><h3>ETH</h3><p class="price">$${eth.PRICE.toLocaleString()}</p><p>24h: ${eth.CHANGEPCT24HOUR.toFixed(2)}%</p></div>;
+    
+    let sol = data.RAW.SOL.USD;
+    html += <div class="card"><h3>SOL</h3><p class="price">$${sol.PRICE.toLocaleString()}</p><p>24h: ${sol.CHANGEPCT24HOUR.toFixed(2)}%</p></div>;
+    
     document.getElementById('crypto').innerHTML = html;
   }catch(e){ document.getElementById('crypto').innerHTML = 'API Error'; }
 
   try{
-    // Forex - මේක free + fast
+    // Forex - exchangerate-api
     let res = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
     let data = await res.json();
     let usd = data.rates.LKR.toFixed(2);
@@ -52,6 +56,7 @@ async function loadData(){
   }catch(e){ document.getElementById('forex').innerHTML = 'API Error'; }
 }
 loadData();
+setInterval(loadData, 60000); // 1 min එකට auto update
 </script>
 </body>
 </html>
